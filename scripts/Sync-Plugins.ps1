@@ -19,9 +19,20 @@ if (-not (Test-Path $modulesDir)) {
     exit 1
 }
 
-$pluginDirs = Get-ChildItem -Path $modulesDir -Recurse -Filter "version.php" -File -ErrorAction SilentlyContinue |
+$versionDirs = Get-ChildItem -Path $modulesDir -Recurse -Filter "version.php" -File -ErrorAction SilentlyContinue |
     ForEach-Object { $_.Directory } |
     Sort-Object FullName -Unique
+
+# Conserva solo las raices de plugin de nivel superior: descarta cualquier
+# version.php anidado dentro de otro plugin (subplugins, fixtures de tests),
+# ya que su bind mount quedaria solapado por el del plugin padre.
+$pluginDirs = $versionDirs | Where-Object {
+    $current = $_
+    -not ($versionDirs | Where-Object {
+        $_.FullName -ne $current.FullName -and
+        $current.FullName.StartsWith($_.FullName + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)
+    })
+}
 
 if (-not $pluginDirs) {
     Write-Host "No se encontro ningun plugin (ningun version.php) bajo modules/."

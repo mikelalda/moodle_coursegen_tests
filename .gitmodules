@@ -1,0 +1,12 @@
+[submodule "modules/ai/provider/birtai"]
+	path = modules/ai/provider/birtai
+	url = https://github.com/maldalur/birtai
+[submodule "modules/local/assign_ai"]
+	path = modules/local/assign_ai
+	url = https://github.com/maldalur/assign_ai
+[submodule "modules/local/coursegen"]
+	path = modules/local/coursegen
+	url = https://github.com/maldalur/coursegen.git
+[submodule "moodle-course-generator"]
+	path = moodle-course-generator
+	url = https://github.com/maldalur/moodle-course-generator.git
