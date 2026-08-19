@@ -15,11 +15,23 @@ moodle_container/
 ├── moodledata/                # moodledata persistente (fuera de moodle/)
 ├── modules/                   # <- AQUI VAN TUS PLUGINS, ver modules/README.md
 └── scripts/
-    ├── Sync-Plugins.ps1       # Detecta plugins en modules/ y genera el override
-    └── Install-Moodle.ps1     # Instala Moodle por CLI (solo la primera vez)
+    ├── sync-plugins.sh        # Linux: detecta plugins en modules/ y genera el override
+    ├── install-moodle.sh      # Linux: instala Moodle por CLI (solo la primera vez)
+    ├── Sync-Plugins.ps1       # Windows/PowerShell: equivalente de sync-plugins.sh
+    └── Install-Moodle.ps1     # Windows/PowerShell: equivalente de install-moodle.sh
 ```
 
 ## Primer arranque
+
+Linux:
+
+```bash
+git submodule update --init --recursive
+docker compose up -d
+./scripts/install-moodle.sh
+```
+
+Windows (PowerShell):
 
 ```powershell
 docker compose up -d
@@ -53,8 +65,9 @@ Pasos:
 
 1. Copia o enlaza la carpeta del plugin dentro de la ruta correspondiente en
    `modules/` (debe contener su `version.php`).
-2. Ejecuta `.\scripts\Sync-Plugins.ps1` — regenera
-   `docker-compose.override.yml` con un bind mount por cada plugin encontrado.
+2. Ejecuta `./scripts/sync-plugins.sh` (o `.\scripts\Sync-Plugins.ps1` en
+   PowerShell) — regenera `docker-compose.override.yml` con un bind mount por
+   cada plugin encontrado.
 3. Aplica los cambios: `docker compose up -d`.
 4. Entra en `http://localhost:8080/admin/index.php` para completar la
    instalación/actualización de la base de datos del plugin nuevo (Moodle lo
@@ -64,7 +77,7 @@ Para quitar un plugin, borra su carpeta de `modules/` y repite los pasos 2-3.
 
 ## Comandos útiles
 
-```powershell
+```bash
 docker compose exec moodle php admin/cli/purge_caches.php
 docker compose exec moodle php admin/cli/upgrade.php --non-interactive
 docker compose logs -f moodle
@@ -74,10 +87,16 @@ docker compose down -v       # parar y borrar tambien la base de datos
 
 ## Notas
 
-- `moodle/` es un checkout de git de Moodle; no lo metas como submódulo de
-  otro repo sin pensarlo, ya tiene su propio `.git`.
+- `moodle/` es un submódulo apuntando a `MOODLE_405_STABLE` del repo oficial,
+  declarado como `shallow` para que se clone con `--depth 1` (Moodle es grande).
+  Su propio `.gitignore` ya excluye `config.php`, así que el estado del repo
+  padre no se ensucia al instalar.
 - `moodledata/` y la base de datos (`db_data` volume) persisten entre
   reinicios; bórralos si quieres empezar de cero.
+- En Linux los bind mounts conservan el UID del host: `install-moodle.sh` deja
+  `moodledata/` en modo `0777` (el mismo valor por defecto que usa Moodle en
+  `$CFG->directorypermissions`) para que Apache (`www-data`) pueda escribir, y
+  devuelve `moodle/config.php` al usuario del host tras la instalacion.
 - La imagen usada (`moodlehq/moodle-php-apache`) es la oficial de Moodle HQ
   para entornos de desarrollo/pruebas, no incluye Moodle preinstalado: el
   código vive en `moodle/` montado como bind mount.

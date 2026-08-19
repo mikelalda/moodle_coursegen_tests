@@ -10,3 +10,8 @@
 [submodule "moodle-course-generator"]
 	path = moodle-course-generator
 	url = https://github.com/maldalur/moodle-course-generator.git
+[submodule "moodle"]
+	path = moodle
+	url = https://github.com/moodle/moodle.git
+	branch = MOODLE_405_STABLE
+	shallow = true
