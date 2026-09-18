@@ -15,3 +15,7 @@
 	url = https://github.com/moodle/moodle.git
 	branch = MOODLE_405_STABLE
 	shallow = true
+[submodule "modules/blocks/ahotts_embhl"]
+	path = modules/blocks/ahotts_embhl
+	url = https://github.com/mikelalda/blocks_ahotts_embhl.git
+	branch = feature/itzune-voices-and-scorm-bridge
