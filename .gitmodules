@@ -19,3 +19,7 @@
 	path = modules/blocks/ahotts_embhl
 	url = https://github.com/mikelalda/blocks_ahotts_embhl.git
 	branch = feature/itzune-voices-and-scorm-bridge
+[submodule "modules/lib/editor/tiny/plugins/widgethub"]
+	path = modules/lib/editor/tiny/plugins/widgethub
+	url = https://github.com/mikelalda/moodle-tiny_widgethub.git
+	branch = apuntes

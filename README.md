@@ -85,6 +85,19 @@ docker compose down          # parar (conserva datos)
 docker compose down -v       # parar y borrar tambien la base de datos
 ```
 
+### Compilar el JavaScript de un plugin (AMD)
+
+Moodle sirve `amd/build/*.min.js`, no `amd/src`: tras cambiar el JS de un plugin
+hay que compilarlo. No hace falta Node en el host; el script usa el Grunt de
+Moodle dentro de un contenedor `node` (la primera vez instala sus dependencias
+en el volumen Docker `moodle_node_modules`). Grunt pasa también ESLint.
+
+```bash
+scripts/build-amd.sh                    # local/coursegen
+scripts/build-amd.sh local/assign_ai    # otro plugin de modules/
+docker compose exec moodle php admin/cli/purge_caches.php
+```
+
 ## Notas
 
 - `moodle/` es un submódulo apuntando a `MOODLE_405_STABLE` del repo oficial,
