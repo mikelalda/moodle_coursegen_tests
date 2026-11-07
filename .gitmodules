@@ -1,19 +1,19 @@
 [submodule "modules/ai/provider/birtai"]
 	path = modules/ai/provider/birtai
-	url = https://github.com/maldalur/birtai
+	url = https://github.com/mikelalda/birtai.git
 [submodule "modules/local/assign_ai"]
 	path = modules/local/assign_ai
-	url = https://github.com/maldalur/assign_ai
+	url = https://github.com/mikelalda/assign_ai.git
 [submodule "modules/local/coursegen"]
 	path = modules/local/coursegen
-	url = https://github.com/maldalur/coursegen.git
+	url = https://github.com/mikelalda/coursegen.git
 [submodule "moodle-course-generator"]
 	path = moodle-course-generator
 	url = https://github.com/maldalur/moodle-course-generator.git
 [submodule "moodle"]
 	path = moodle
 	url = https://github.com/moodle/moodle.git
-	branch = MOODLE_405_STABLE
+	branch = MOODLE_503_STABLE
 	shallow = true
 [submodule "modules/blocks/ahotts_embhl"]
 	path = modules/blocks/ahotts_embhl

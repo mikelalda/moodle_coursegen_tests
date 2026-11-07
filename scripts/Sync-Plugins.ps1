@@ -3,6 +3,8 @@ Escanea modules/ buscando carpetas de plugin (cualquier directorio que contenga
 un version.php, marcador estandar de plugin de Moodle) y genera
 docker-compose.override.yml con un bind mount por plugin, replicando su ruta
 relativa dentro del codigo de Moodle (./modules/local/foo -> /var/www/html/local/foo).
+Desde Moodle 5.1 el codigo web vive en moodle/public, asi que si existe esa
+carpeta los plugins se montan alli (/var/www/html/public/local/foo).
 
 Tras anadir o quitar carpetas en modules/, ejecuta este script y luego:
     docker compose up -d
@@ -13,6 +15,11 @@ $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $modulesDir = Join-Path $root "modules"
 $overrideFile = Join-Path $root "docker-compose.override.yml"
+
+$target = "/var/www/html"
+if (Test-Path (Join-Path $root "moodle/public")) {
+    $target = "/var/www/html/public"
+}
 
 if (-not (Test-Path $modulesDir)) {
     Write-Host "No existe la carpeta modules/."
@@ -47,7 +54,7 @@ $lines = @("services:", "  moodle:", "    volumes:")
 
 foreach ($dir in $pluginDirs) {
     $relPath = $dir.FullName.Substring($modulesDir.Length + 1) -replace '\\', '/'
-    $lines += "      - ./modules/${relPath}:/var/www/html/${relPath}"
+    $lines += "      - ./modules/${relPath}:${target}/${relPath}"
     Write-Host "Plugin detectado: $relPath"
 }
 

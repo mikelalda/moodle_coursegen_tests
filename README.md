@@ -1,6 +1,6 @@
-# Moodle 4.5 en Docker — entorno de pruebas para plugins
+# Moodle 5.3 en Docker — entorno de pruebas para plugins
 
-Entorno local con Moodle 4.5 (`MOODLE_405_STABLE`) + MariaDB, pensado para
+Entorno local con Moodle 5.3 (`MOODLE_503_STABLE`) + MariaDB 11.4 y PHP 8.4, pensado para
 desarrollar y probar plugins (módulos) sueltos sin tener que tocar el código
 núcleo de Moodle.
 
@@ -11,7 +11,7 @@ moodle_container/
 ├── docker-compose.yml        # Servicios: moodle, db (MariaDB), adminer
 ├── docker-compose.override.yml  # Generado automaticamente (mounts de plugins)
 ├── .env                       # Credenciales, puertos, datos de instalacion
-├── moodle/                    # Codigo fuente de Moodle (clonado de git, rama 4.5)
+├── moodle/                    # Codigo fuente de Moodle (clonado de git, rama 5.3)
 ├── moodledata/                # moodledata persistente (fuera de moodle/)
 ├── modules/                   # <- AQUI VAN TUS PLUGINS, ver modules/README.md
 └── scripts/
@@ -27,6 +27,11 @@ Linux:
 
 ```bash
 git submodule update --init --recursive
+# Moodle 5.1+ necesita sus dependencias de Composer (moodle/vendor):
+docker run --rm -u "$(id -u):$(id -g)" -e HOME=/tmp -v "$PWD/moodle:/app" -w /app \
+    --entrypoint sh moodlehq/moodle-php-apache:8.4-bookworm -c \
+    'curl -sS https://getcomposer.org/installer | php -- --quiet --install-dir=/tmp && php /tmp/composer.phar install --no-dev --classmap-authoritative'
+./scripts/sync-plugins.sh
 docker compose up -d
 ./scripts/install-moodle.sh
 ```
@@ -100,10 +105,15 @@ docker compose exec moodle php admin/cli/purge_caches.php
 
 ## Notas
 
-- `moodle/` es un submódulo apuntando a `MOODLE_405_STABLE` del repo oficial,
+- `moodle/` es un submódulo apuntando a `MOODLE_503_STABLE` del repo oficial,
   declarado como `shallow` para que se clone con `--depth 1` (Moodle es grande).
   Su propio `.gitignore` ya excluye `config.php`, así que el estado del repo
   padre no se ensucia al instalar.
+- Desde Moodle 5.1 el código web está en `moodle/public`: la imagen lo detecta y
+  sirve esa carpeta, y `sync-plugins.sh` monta los plugins en `public/<ruta>`.
+  `config.php` y `admin/cli/` siguen en la raíz de `moodle/`. Tras cambiar de
+  versión de Moodle hay que volver a ejecutar `composer install` (arriba) y
+  `scripts/sync-plugins.sh`.
 - `moodledata/` y la base de datos (`db_data` volume) persisten entre
   reinicios; bórralos si quieres empezar de cero.
 - En Linux los bind mounts conservan el UID del host: `install-moodle.sh` deja

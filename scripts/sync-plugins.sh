@@ -4,6 +4,8 @@
 # un version.php, marcador estandar de plugin de Moodle) y genera
 # docker-compose.override.yml con un bind mount por plugin, replicando su ruta
 # relativa dentro del codigo de Moodle (./modules/local/foo -> /var/www/html/local/foo).
+# Desde Moodle 5.1 el codigo web vive en moodle/public, asi que si existe esa
+# carpeta los plugins se montan alli (/var/www/html/public/local/foo).
 #
 # Tras anadir o quitar carpetas en modules/, ejecuta este script y luego:
 #     docker compose up -d
@@ -13,6 +15,11 @@ set -euo pipefail
 root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 modules_dir="$root/modules"
 override_file="$root/docker-compose.override.yml"
+
+target=/var/www/html
+if [[ -d "$root/moodle/public" ]]; then
+    target=/var/www/html/public
+fi
 
 if [[ ! -d "$modules_dir" ]]; then
     echo "No existe la carpeta modules/." >&2
@@ -55,7 +62,7 @@ fi
     echo "    volumes:"
     for dir in "${plugin_dirs[@]}"; do
         rel="${dir#"$modules_dir/"}"
-        echo "      - ./modules/${rel}:/var/www/html/${rel}"
+        echo "      - ./modules/${rel}:${target}/${rel}"
     done
 } > "$override_file"
 
