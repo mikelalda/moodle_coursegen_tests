@@ -1,6 +1,7 @@
 [submodule "modules/ai/provider/birtai"]
 	path = modules/ai/provider/birtai
 	url = https://github.com/mikelalda/birtai.git
+	branch = main
 [submodule "modules/local/assign_ai"]
 	path = modules/local/assign_ai
 	url = https://github.com/mikelalda/assign_ai.git
